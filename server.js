@@ -91,10 +91,10 @@ const server = http.createServer((req, res)=>{
 
       req.on('end', ()=>{
         try {
-          const { name, email, password } = JSON.parse(body)
+          const { email, password } = JSON.parse(body)
 
-          if(!name || !email || !password){
-           throw new Error('Your name, email and password required')
+          if(!email || !password){
+           throw new Error('Email and password required')
           }
 
           fs.readFile(usersPath, 'utf8', (err, data)=>{
@@ -102,6 +102,7 @@ const server = http.createServer((req, res)=>{
               res.statusCode = 500;
               res.setHeader('Content-Type', 'application/json')
               res.end(JSON.stringify({ error: 'Server error reading users' }))
+              return;
             }
             const users = JSON.parse(data || '[]')
             const user = users.find(u=>u.email === email && u.password === password)
