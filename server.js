@@ -43,32 +43,41 @@ const server = http.createServer((req, res) => {
   }
 
   // Sign Up
-  if (req.url === '/signup' && req.method === 'POST') {
-    let body = ''
-    req.on('data', chunk => (body += chunk.toString()))
-    req.on('end', () => {
-      try {
-        const { name, email, password, confirm } = JSON.parse(body)
-        if (!name || !email || !password || password !== confirm) {
-          throw new Error('Invalid sign up details')
-        }
+if (req.url === '/signup' && req.method === 'POST') {
+  let body = ''
+  req.on('data', chunk => (body += chunk.toString()))
+  req.on('end', () => {
+    try {
+      const { name, email, password, confirm } = JSON.parse(body)
+      console.log('📨 New signup request received:')
+      console.log('➡️ Name:', name)
+      console.log('➡️ Email:', email)
 
-        const users = JSON.parse(fs.readFileSync(usersPath, 'utf8') || '[]')
-        if (users.some(u => u.email === email)) {
-          res.writeHead(409, { 'Content-Type': 'application/json' })
-          return res.end(JSON.stringify({ error: 'User already exists' }))
-        }
-
-        users.push({ name, email, password })
-        fs.writeFileSync(usersPath, JSON.stringify(users, null, 2))
-        res.writeHead(200, { 'Content-Type': 'application/json' })
-        res.end(JSON.stringify({ message: 'Signup successful', redirect: '/login' }))
-      } catch (err) {
-        res.writeHead(400, { 'Content-Type': 'application/json' })
-        res.end(JSON.stringify({ error: err.message }))
+      if (!name || !email || !password || password !== confirm) {
+        throw new Error('Invalid sign up details')
       }
-    })
-  }
+
+      const users = JSON.parse(fs.readFileSync(usersPath, 'utf8') || '[]')
+      if (users.some(u => u.email === email)) {
+        console.log('⚠️ Email already exists:', email)
+        res.writeHead(409, { 'Content-Type': 'application/json' })
+        return res.end(JSON.stringify({ error: 'User already exists' }))
+      }
+
+      users.push({ name, email, password })
+      fs.writeFileSync(usersPath, JSON.stringify(users, null, 2))
+      console.log('✅ User added:', { name, email })
+
+      res.writeHead(200, { 'Content-Type': 'application/json' })
+      res.end(JSON.stringify({ message: 'Signup successful', redirect: '/login' }))
+    } catch (err) {
+      console.log('❌ Signup error:', err.message)
+      res.writeHead(400, { 'Content-Type': 'application/json' })
+      res.end(JSON.stringify({ error: err.message }))
+    }
+  })
+}
+
 
   // Login
   else if (req.url === '/login' && req.method === 'POST') {
