@@ -69,7 +69,7 @@ if (req.url === '/signup' && req.method === 'POST') {
       console.log('✅ User added:', { name, email })
 
       res.writeHead(200, { 'Content-Type': 'application/json' })
-      res.end(JSON.stringify({ message: 'Signup successful', redirect: '/login' }))
+      res.end(JSON.stringify({ message: 'Signup successful', redirect: '/home' }))
     } catch (err) {
       console.log('❌ Signup error:', err.message)
       res.writeHead(400, { 'Content-Type': 'application/json' })
@@ -92,7 +92,7 @@ if (req.url === '/signup' && req.method === 'POST') {
         if (!user) throw new Error('Invalid credentials')
 
         res.writeHead(200, { 'Content-Type': 'application/json' })
-        res.end(JSON.stringify({ message: 'Login successful', name: user.name, redirect: '/home' }))
+        res.end(JSON.stringify({ message: 'Login successful', name: user.name, redirect: '/landing-page' }))
       } catch (err) {
         res.writeHead(401, { 'Content-Type': 'application/json' })
         res.end(JSON.stringify({ error: err.message }))
